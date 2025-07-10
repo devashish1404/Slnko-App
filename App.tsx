@@ -1,20 +1,13 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { StyleSheet, Text, useColorScheme, View } from "react-native";
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === "dark";
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NewAppScreen templateFileName="App.tsx" />
+      <Text style={isDarkMode ? styles.whiteText : styles.darkText}>
+        WELCOME TO SLNKO ENERGY PVT LTD
+      </Text>
     </View>
   );
 }
@@ -22,6 +15,14 @@ function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  whiteText: {
+    color: "#FFFFFF",
+  },
+  darkText: {
+    color: "#000000",
   },
 });
 
