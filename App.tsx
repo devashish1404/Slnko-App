@@ -1,29 +1,22 @@
-import { StyleSheet, Text, useColorScheme, View } from "react-native";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import LoginScreen from "./src/screens/LoginScreen";
+import HomeScreen from "./src/screens/HomeScreen";
+import type { RootStackParamList } from "./src/navigation/types";
 
-function App() {
-  const isDarkMode = useColorScheme() === "dark";
+const Stack = createNativeStackNavigator();
 
+const App = () => {
+  const Stack = createNativeStackNavigator<RootStackParamList>();
   return (
-    <View style={styles.container}>
-      <Text style={isDarkMode ? styles.whiteText : styles.darkText}>
-        WELCOME TO SLNKO ENERGY PVT LTD
-      </Text>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  whiteText: {
-    color: "#FFFFFF",
-  },
-  darkText: {
-    color: "#000000",
-  },
-});
+};
 
 export default App;
