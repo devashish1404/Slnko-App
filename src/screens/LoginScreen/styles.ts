@@ -34,8 +34,8 @@ export const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: "#003366",
     width: "100%",
-    paddingVertical: 14,
-    borderRadius: 10,
+    paddingVertical: 8,
+    borderRadius: 20,
     alignItems: "center",
     marginBottom: 16,
   },
@@ -49,6 +49,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     textDecorationLine: "underline",
     marginBottom: 40,
+    fontWeight:"bold"
   },
   footer: {
     alignItems: "center",
