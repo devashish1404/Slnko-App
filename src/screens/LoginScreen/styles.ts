@@ -64,4 +64,11 @@ export const styles = StyleSheet.create({
     height: 50,
     // marginTop: 4,
   },
+  loaderContainer: {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "#fff",
+},
+
 });

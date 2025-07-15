@@ -17,6 +17,7 @@ import { styles } from "../LoginScreen/styles";
 import { saveToken } from "../../utils/auth";
 import type { RootStackParamList } from "../../../src/navigation/types";
 import ButtonComp from "../../components/Button";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -45,30 +46,69 @@ const LoginScreen: React.FC = () => {
 
   const handleLogin = async () => {
     if (!name || !password) {
-      showDialog("Missing Fields", "Please enter both ID and password");
+      showDialog(
+        "Missing Fields",
+        "Please enter both username/email and password"
+      );
       return;
     }
 
     try {
       setLoading(true);
 
-      const response = await axios.post("https://api.slnkoprotrac.com/v1/logiN-IT", {
-        name,
-        password,
-      });
+      const response = await axios.post(
+        "https://api.slnkoprotrac.com/v1/logiN-IT",
+        {
+          name,
+          password,
+        }
+      );
 
       const token = response.data.token;
+      const userId = response.data.userId;
 
       if (token) {
-        await saveToken(token);
-        showDialog("Success", "Logged in!");
+        await AsyncStorage.setItem("authToken", token);
+      } else {
+        Alert.alert("Error token");
+      }
+
+      const userResponse = await axios.get(
+        `https://api.slnkoprotrac.com/v1/get-all-user-IT`,
+        {
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      );
+
+      const matchedUser = userResponse?.data?.data.find(
+        (item: any) => String(item._id) === String(userId)
+      );
+
+      if (matchedUser) {
+        const userDetails = {
+          name: matchedUser.name,
+          email: matchedUser.email,
+          phone: matchedUser.phone,
+          emp_id: matchedUser.emp_id,
+          role: matchedUser.role,
+          department: matchedUser.department || "",
+          createdAt: matchedUser.createdAt || "",
+          userID: matchedUser._id || "",
+        };
+        await AsyncStorage.setItem("userData", JSON.stringify(userDetails));
+        showDialog("Success", `Welcome ${matchedUser.name || "User"}!`);
         navigation.navigate("Home");
       } else {
-        showDialog("Error", "Token not received");
+        showDialog("Error", "User not found in user list");
       }
     } catch (error) {
       console.error(error);
-      showDialog("Login Failed", "Please check your credentials and try again.");
+      showDialog(
+        "Login Failed",
+        "Please check your credentials and try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -76,14 +116,12 @@ const LoginScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Image
         source={require("../../../assets/images/protrac_logo.png")}
         style={styles.logo}
         resizeMode="contain"
       />
 
-      {/* Input - Name */}
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.input}
@@ -94,7 +132,6 @@ const LoginScreen: React.FC = () => {
         />
       </View>
 
-      {/* Input - Password */}
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.input}
@@ -113,16 +150,12 @@ const LoginScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      
-      {/* Login Button */}
       <ButtonComp onPress={handleLogin} title="Login" />
 
-      {/* Forgot Password */}
       <TouchableOpacity>
         <Text style={styles.forgotText}>Forget Password?</Text>
       </TouchableOpacity>
 
-      {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.poweredBy}>Powered By</Text>
         <Image
@@ -132,9 +165,12 @@ const LoginScreen: React.FC = () => {
         />
       </View>
 
-      {/* Dialog */}
       <Portal>
-        <Dialog visible={dialogVisible} onDismiss={hideDialog} style={{ backgroundColor: "lightsteelblue" }}>
+        <Dialog
+          visible={dialogVisible}
+          onDismiss={hideDialog}
+          style={{ backgroundColor: "lightsteelblue" }}
+        >
           <Dialog.Title style={{ color: "black", fontWeight: "bold" }}>
             {dialogTitle}
           </Dialog.Title>

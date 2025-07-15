@@ -39,11 +39,11 @@ export const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginVertical: 20,
+    // marginVertical: 1,
   },
   logo: {
-    width: 120,
-    height: 50,
+    width: 250,
+    height: 120,
   },
   subtitle: {
     marginTop: 6,
@@ -53,14 +53,14 @@ export const styles = StyleSheet.create({
   },
   grid: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    // paddingBottom: 80,
   },
   card: {
     width: (width - 60) / 2,
     aspectRatio: 1,
     backgroundColor: "#f0f4f7",
     borderRadius: 12,
-    padding: 10,
+    // padding: 10,
     marginBottom: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -73,6 +73,12 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "500",
   },
+  iconImage: {
+    width: 40,
+    height: 40,
+    marginBottom: 8,
+  },
+
   footer: {
     alignItems: "center",
     marginTop: "auto",
@@ -84,7 +90,7 @@ export const styles = StyleSheet.create({
   },
   footerLogo: {
     width: 80,
-    height: 30,
+    height: 40,
     marginTop: 4,
   },
 });
