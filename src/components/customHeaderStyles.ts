@@ -2,19 +2,23 @@ import { StyleSheet, Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
+  // container: {
+  //   flex: 2,
+  //   backgroundColor: "#fff",
+   
+  // },
   header: {
+    // marginTop:"2%",
     backgroundColor: "#003366",
-    paddingVertical: 15,
+    paddingVertical: 30,
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
+    // height:100
   },
   headerTitle: {
+    marginTop:"5%",
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",

@@ -19,14 +19,10 @@ import type { RootStackParamList } from "../../../src/navigation/types";
 import ButtonComp from "../../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Login"
->;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Login">;
 
 const LoginScreen: React.FC = () => {
-  const navigation = useNavigation<LoginScreenNavigationProp>();
-
+  const navigation = useNavigation<NavigationProp>();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -57,7 +53,7 @@ const LoginScreen: React.FC = () => {
       setLoading(true);
 
       const response = await axios.post(
-        "https://api.slnkoprotrac.com/v1/logiN-IT",
+        "https://dev.api.slnkoprotrac.com/v1/logiN-IT",
         {
           name,
           password,
@@ -99,7 +95,7 @@ const LoginScreen: React.FC = () => {
         };
         await AsyncStorage.setItem("userData", JSON.stringify(userDetails));
         showDialog("Success", `Welcome ${matchedUser.name || "User"}!`);
-        navigation.navigate("Home");
+        navigation.replace("Main");
       } else {
         showDialog("Error", "User not found in user list");
       }

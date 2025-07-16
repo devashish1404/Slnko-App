@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: "#fff",
     padding: 24,
     justifyContent: "center",
@@ -53,7 +53,7 @@ export const styles = StyleSheet.create({
   },
   footer: {
     alignItems: "center",
-    marginTop: "45%",
+    marginTop: "40%",
   },
   poweredBy: {
     color: "#888",

@@ -12,6 +12,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { styles } from "../HomeScreen/styles";
 import CustomHeader from "../../components/customHeader";
 import { useNavigation } from "@react-navigation/native";
+// import TestingApp from "../../components/notifyUser";
 const { width } = Dimensions.get("window");
 
 const features = [
@@ -83,6 +84,7 @@ const HomeScreen: React.FC = () => {
         />
         {/* <Text style={styles.subtitle}>The Next Level Engineering</Text> */}
       </View>
+      {/* <TestingApp /> */}
 
       <FlatList
         data={features}
@@ -93,14 +95,14 @@ const HomeScreen: React.FC = () => {
         columnWrapperStyle={{ justifyContent: "space-between" }}
       />
 
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <Text style={styles.footerText}>Powered By</Text>
         <Image
           source={require("../../../assets/images/slnko_blue_logo.png")}
           style={styles.footerLogo}
           resizeMode="contain"
         />
-      </View>
+      </View> */}
     </View>
   );
 };

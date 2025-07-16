@@ -48,7 +48,7 @@ const ProfileDetail: React.FC = () => {
         const userId = parsedUserData.userID;
 
         const response = await axios.get(
-          "https://api.slnkoprotrac.com/v1/get-all-user-IT",
+          "https://dev.api.slnkoprotrac.com/v1/get-all-user-IT",
           {
             headers: {
               "x-auth-token": token,
@@ -104,7 +104,7 @@ const ProfileDetail: React.FC = () => {
       }
 
       const response = await axios.put(
-        `https://api.slnkoprotrac.com/v1/edit-user/${user?.userID}`,
+        `https://dev.api.slnkoprotrac.com/v1/edit-user/${user?.userID}`,
         {
           email,
           phone,
