@@ -56,6 +56,8 @@ const HomeScreen: React.FC = () => {
     onPress={() => {
       if (item.label === "My profile") {
         navigation.navigate("ProfileDetail" as never);
+      } else if (item.label === "Expense Claim"){
+          navigation.navigate("ExpenseDetail" as never)
       }
     }}
   >

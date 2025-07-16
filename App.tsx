@@ -3,7 +3,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./src/screens/LoginScreen";
 import HomeScreen from "./src/screens/HomeScreen";
-import ProfileDetail from "./src/screens/ProfileScreen/ProfileDetail"
+import ProfileDetail from "./src/screens/ProfileScreen/ProfileDetail";
+import ExpenseDetail from "./src/screens/ExpenseClaim/ExpenseDetail";
 import { Provider as PaperProvider } from "react-native-paper";
 
 const Stack = createNativeStackNavigator();
@@ -20,6 +21,7 @@ const App = () => {
             options={{headerShown:false}}
             />
             <Stack.Screen name="ProfileDetail" component={ProfileDetail} />
+            <Stack.Screen name="ExpenseDetail" component={ExpenseDetail} />
         </Stack.Navigator>
       
       </NavigationContainer>
