@@ -76,5 +76,6 @@ yarn-error.log
 
 
 .env
+.env.d.ts
 node_modules
 package-lock.json
