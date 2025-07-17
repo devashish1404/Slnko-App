@@ -1,4 +1,4 @@
-import React from "react";
+import "react-native-reanimated";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -11,8 +11,7 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import CustomSidebar from "./src/components/customSidebar";
-
-
+import { TabProvider } from "./src/store/tabContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,9 +40,25 @@ const BottomTabs = () => {
         options={{ headerShown: false }}
       />
 
-      <Tab.Screen name="ProfileDetail" component={ProfileDetail} />
+      <Tab.Screen name="ProfileDetail" component={ProfileDetail}  options={{
+          title: "Profile Detail",
+          headerStyle: {
+            backgroundColor: "#003366",
+          },
+          headerTintColor:"#fff"
+        }} />
 
-      <Tab.Screen name="ExpenseDetail" component={ExpenseDetail} />
+      <Tab.Screen
+        name="ExpenseDetail"
+        component={ExpenseDetail}
+        options={{
+          title: "Expense Detail",
+          headerStyle: {
+            backgroundColor: "#003366",
+          },
+          headerTintColor:"#fff"
+        }}
+      />
     </Tab.Navigator>
   );
 };
@@ -61,20 +76,22 @@ const DrawerLayout = () => {
 
 const App = () => {
   return (
-    <PaperProvider>
-      <NavigationContainer>
-        <View style={{ flex: 1 }}>
-          <Stack.Navigator initialRouteName="Login">
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen
-              name="Main"
-              component={DrawerLayout}
-              options={{ headerShown: false }}
-            />
-          </Stack.Navigator>
-        </View>
-      </NavigationContainer>
-    </PaperProvider>
+    <TabProvider>
+      <PaperProvider>
+        <NavigationContainer>
+          <View style={{ flex: 1 }}>
+            <Stack.Navigator initialRouteName="Login">
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen
+                name="Main"
+                component={DrawerLayout}
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          </View>
+        </NavigationContainer>
+      </PaperProvider>
+    </TabProvider>
   );
 };
 

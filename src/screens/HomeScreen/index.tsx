@@ -69,12 +69,7 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <CustomHeader
-        title="Profile"
-        profileInitial="R"
-        // onMenuPress={() => console.log("Menu clicked")}
-        // onHomePress={() => console.log("Go to Home")}
-      />
+      <CustomHeader />
 
       <View style={styles.logoContainer}>
         <Image
