@@ -209,4 +209,8 @@ const ExpenseDetail: React.FC = () => {
   );
 };
 
+
+
+
 export default ExpenseDetail;
+
