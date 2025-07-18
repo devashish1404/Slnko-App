@@ -12,6 +12,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import CustomSidebar from "./src/components/customSidebar";
 import { TabProvider } from "./src/store/tabContext";
+// import ExpenseApprove from "./src/screens/ExpenseApproval/ExpenseApprove";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,13 +41,17 @@ const BottomTabs = () => {
         options={{ headerShown: false }}
       />
 
-      <Tab.Screen name="ProfileDetail" component={ProfileDetail}  options={{
+      <Tab.Screen
+        name="ProfileDetail"
+        component={ProfileDetail}
+        options={{
           title: "Profile Detail",
           headerStyle: {
             backgroundColor: "#003366",
           },
-          headerTintColor:"#fff"
-        }} />
+          headerTintColor: "#fff",
+        }}
+      />
 
       <Tab.Screen
         name="ExpenseDetail"
@@ -56,9 +61,10 @@ const BottomTabs = () => {
           headerStyle: {
             backgroundColor: "#003366",
           },
-          headerTintColor:"#fff"
+          headerTintColor: "#fff",
         }}
       />
+     
     </Tab.Navigator>
   );
 };
@@ -70,6 +76,7 @@ const DrawerLayout = () => {
       drawerContent={() => <CustomSidebar />}
     >
       <Drawer.Screen name="Tabs" component={BottomTabs} />
+      
     </Drawer.Navigator>
   );
 };
@@ -87,6 +94,11 @@ const App = () => {
                 component={DrawerLayout}
                 options={{ headerShown: false }}
               />
+              {/* <Stack.Screen
+                name="ExpenseApprove"
+                component={ExpenseApprove}
+                options={{ title: "Expense Approval" }}
+              /> */}
             </Stack.Navigator>
           </View>
         </NavigationContainer>
