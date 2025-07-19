@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   View,
@@ -7,35 +7,25 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Modal,
 } from "react-native";
-import { Button, Menu, Provider, Switch } from "react-native-paper";
+import { Provider, Switch } from "react-native-paper";
+// No Picker import needed
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import DocumentPicker from "react-native-document-picker";
+import DocumentPicker from "@react-native-documents/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { styles } from "./styles";
 import { useTab } from "../../store/tabContext";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { APP_USE_URL } from "@env";
+import { getCategoryDescription } from "../../utils/expenseList";
 
 const ExpenseDetail: React.FC = () => {
-  const navigation = useNavigation();
-  const [projectCode, setProjectCode] = useState<string>("");
-  const [projectMenuVisible, setProjectMenuVisible] = useState(false);
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
-  const [showBillDatePicker, setShowBillDatePicker] = useState(false);
-  const [isBillAvailable, setIsBillAvailable] = useState(false);
-
-  const [expenseCategory, setExpenseCategory] = useState("");
-  const [billNumber, setBillNumber] = useState("");
-  const [billDate, setBillDate] = useState<Date | undefined>();
-  const [billAmount, setBillAmount] = useState("");
-  const [totalAmount, setTotalAmount] = useState("");
-  const [remarks, setRemarks] = useState("");
-  const [fileName, setFileName] = useState<string>("");
   const { activeTab, setActiveTab } = useTab();
   const [projectName, setProjectName] = useState("");
-  const [state, setState] = useState("");
+  type Project = { code: string; name: string; _id: string };
+  const [projectList, setProjectList] = useState<Project[]>([]);
 
   type Expense = {
     expenseCategory: string;
@@ -53,6 +43,7 @@ const ExpenseDetail: React.FC = () => {
     startDate: Date | undefined;
     endDate: Date | undefined;
     expenses: Expense[];
+    showMenu: boolean;
   };
 
   const [itineraries, setItineraries] = useState<Itinerary[]>([
@@ -72,8 +63,20 @@ const ExpenseDetail: React.FC = () => {
           remarks: "",
         },
       ],
+      showMenu: false,
     },
   ]);
+
+  const [dropdownSearch, setDropdownSearch] = useState<string[]>([]);
+
+  useEffect(() => {
+    setDropdownSearch((prev) => {
+      const arr = [...prev];
+      while (arr.length < itineraries.length) arr.push("");
+      while (arr.length > itineraries.length) arr.pop();
+      return arr;
+    });
+  }, [itineraries.length]);
   const [showStartPickerIndex, setShowStartPickerIndex] = useState<
     number | null
   >(null);
@@ -100,6 +103,7 @@ const ExpenseDetail: React.FC = () => {
             remarks: "",
           },
         ],
+        showMenu: false,
       },
     ]);
   };
@@ -123,13 +127,21 @@ const ExpenseDetail: React.FC = () => {
     expenseIndex: number
   ) => {
     try {
-      const result = await DocumentPicker.pickSingle();
-      const updated = [...itineraries];
-      updated[itineraryIndex].expenses[expenseIndex].fileName =
-        result.name ?? "";
-      setItineraries(updated);
-    } catch (err) {
-      console.log("File pick cancelled");
+      const results = await DocumentPicker.pick();
+
+      if (Array.isArray(results) && results.length > 0) {
+        const file = results[0];
+        const updated = [...itineraries];
+        updated[itineraryIndex].expenses[expenseIndex].fileName =
+          file.name ?? "Unnamed File";
+        setItineraries(updated);
+      }
+    } catch (err: any) {
+      if (err instanceof Error && err.message.includes("cancel")) {
+        console.log("File pick cancelled");
+      } else {
+        console.error("File pick error:", err);
+      }
     }
   };
 
@@ -145,6 +157,50 @@ const ExpenseDetail: React.FC = () => {
   ) => {
     const updated = [...itineraries];
     updated[itineraryIndex].expenses.splice(expenseIndex, 1);
+    setItineraries(updated);
+  };
+
+  const OTHERS_OPTION = { code: "Others", name: "", _id: null };
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        const res = await axios.get(`${APP_USE_URL}get-all-projecT-IT`, {
+          headers: {
+            "x-auth-token": token,
+          },
+        });
+        const projects = Array.isArray(res.data.data) ? res.data.data : [];
+        console.log("projects :", projects);
+        setProjectList([...projects, OTHERS_OPTION]);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const handleCodeChange = (itineraryIndex: number, selectedCode: string) => {
+    const updated = [...itineraries];
+    updated[itineraryIndex].state = selectedCode;
+
+    const selectedProject = projectList.find(
+      (proj) => proj.code === selectedCode
+    );
+    if (selectedCode === "Others") {
+      updated[itineraryIndex].projectName = "";
+    } else if (selectedProject) {
+      updated[itineraryIndex].projectName = selectedProject.name;
+    }
+
+    setItineraries(updated);
+  };
+
+  const handleProjectNameChange = (itineraryIndex: number, val: string) => {
+    const updated = [...itineraries];
+    updated[itineraryIndex].projectName = val;
     setItineraries(updated);
   };
 
@@ -184,63 +240,148 @@ const ExpenseDetail: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/*---------------Project code View-------------*/}
-
         {/* Itineraries */}
-        {itineraries.map((itinerary, itineraryIndex) => (
-          <View key={itineraryIndex} style={styles.itemAdd}>
-            <TouchableOpacity
-              onPress={() => handleRemoveItinerary(itineraryIndex)}
-              style={styles.deleteIcon}
-            >
-              <MaterialIcons name="delete" size={24} color="red" />
-            </TouchableOpacity>
-            {/* Project Section */}
+        {itineraries.map((itinerary, iIdx) => (
+          <View key={iIdx} style={styles.itemAdd}>
+            {itineraries.length > 1 && (
+              <TouchableOpacity
+                onPress={() => handleRemoveItinerary(iIdx)}
+                style={styles.deleteIcon}
+              >
+                <MaterialIcons name="delete" size={24} color="red" />
+              </TouchableOpacity>
+            )}
+
+            {/* Project Code Dropdown */}
             <Text style={styles.label}>Project Code*</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Select State"
-              value={itinerary.state}
-              onChangeText={(val) => {
+            <TouchableOpacity
+              style={[styles.dropdownButton, styles.input]}
+              onPress={() => {
                 const updated = [...itineraries];
-                updated[itineraryIndex].state = val;
+                updated[iIdx].showMenu = true;
                 setItineraries(updated);
               }}
-            />
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.dropdownText,
+                  { color: itinerary.state ? "#000" : "#888" },
+                ]}
+              >
+                {itinerary.state || "Select Code"}
+              </Text>
+              <MaterialIcons name="arrow-drop-down" size={24} color="#888" />
+            </TouchableOpacity>
 
+            {/* Modal */}
+            {itinerary.showMenu && (
+              <Modal
+                transparent
+                animationType="fade"
+                visible={itinerary.showMenu}
+                onRequestClose={() => {
+                  const updated = [...itineraries];
+                  updated[iIdx].showMenu = false;
+                  setItineraries(updated);
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.modalOverlay}
+                  activeOpacity={1}
+                  onPress={() => {
+                    const updated = [...itineraries];
+                    updated[iIdx].showMenu = false;
+                    setItineraries(updated);
+                  }}
+                >
+                  <View style={styles.modalDropdown}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search project code..."
+                      value={dropdownSearch[iIdx] || ""}
+                      onChangeText={(text) => {
+                        const updated = [...dropdownSearch];
+                        updated[iIdx] = text;
+                        setDropdownSearch(updated);
+                      }}
+                      autoFocus
+                    />
+                    <ScrollView keyboardShouldPersistTaps="handled">
+                      {[
+                        ...projectList.filter(
+                          (p) => p.code !== OTHERS_OPTION.code
+                        ),
+                        OTHERS_OPTION,
+                      ]
+                        .filter((proj) =>
+                          proj.code
+                            ?.toLowerCase()
+                            .includes(
+                              (dropdownSearch[iIdx] || "").toLowerCase()
+                            )
+                        )
+                        .map((proj, index) => (
+                          <TouchableOpacity
+                            key={proj._id || `proj-${proj.code || index}`}
+                            style={styles.dropdownItem}
+                            onPress={() => {
+                              handleCodeChange(iIdx, proj.code);
+                              const updated = [...itineraries];
+                              updated[iIdx].showMenu = false;
+                              setItineraries(updated);
+                              setDropdownSearch((prev) => {
+                                const arr = [...prev];
+                                arr[iIdx] = "";
+                                return arr;
+                              });
+                            }}
+                          >
+                            <Text style={styles.dropdownItemText}>
+                              {proj.code}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+            )}
+
+            {/* Project Name Input */}
             <Text style={styles.label}>Project Name*</Text>
             <TextInput
-              style={styles.input}
-              placeholder="Select Project Name"
+              style={[
+                styles.input,
+                itinerary.state === "Others" ? {} : { backgroundColor: "#eee" },
+              ]}
+              placeholder="Enter Project Name"
               value={itinerary.projectName}
-              onChangeText={(val) => {
-                const updated = [...itineraries];
-                updated[itineraryIndex].projectName = val;
-                setItineraries(updated);
-              }}
+              onChangeText={(val) => handleProjectNameChange(iIdx, val)}
+              editable={itinerary.state === "Others"}
             />
 
             <View style={styles.row}>
               <View style={styles.half}>
                 <Text style={styles.label}>Start Date</Text>
                 <TouchableOpacity
-                  onPress={() => setShowStartPickerIndex(itineraryIndex)}
+                  onPress={() => setShowStartPickerIndex(iIdx)}
                   style={styles.input}
                 >
                   <Text>
                     {itinerary.startDate
                       ? new Date(itinerary.startDate).toDateString()
-                      : "Select Date"}
+                      : "Start Date"}
                   </Text>
                 </TouchableOpacity>
-                {showStartPickerIndex === itineraryIndex && (
+                {showStartPickerIndex === iIdx && (
                   <DateTimePicker
                     value={new Date()}
                     mode="date"
                     display="default"
                     onChange={(e, date) => {
                       const updated = [...itineraries];
-                      updated[itineraryIndex].startDate = date;
+                      updated[iIdx].startDate = date;
                       setItineraries(updated);
                       setShowStartPickerIndex(null);
                     }}
@@ -251,23 +392,23 @@ const ExpenseDetail: React.FC = () => {
               <View style={styles.half}>
                 <Text style={styles.label}>End Date</Text>
                 <TouchableOpacity
-                  onPress={() => setShowEndPickerIndex(itineraryIndex)}
+                  onPress={() => setShowEndPickerIndex(iIdx)}
                   style={styles.input}
                 >
                   <Text>
                     {itinerary.endDate
                       ? new Date(itinerary.endDate).toDateString()
-                      : "Select Date"}
+                      : "End Date"}
                   </Text>
                 </TouchableOpacity>
-                {showEndPickerIndex === itineraryIndex && (
+                {showEndPickerIndex === iIdx && (
                   <DateTimePicker
                     value={new Date()}
                     mode="date"
                     display="default"
                     onChange={(e, date) => {
                       const updated = [...itineraries];
-                      updated[itineraryIndex].endDate = date;
+                      updated[iIdx].endDate = date;
                       setItineraries(updated);
                       setShowEndPickerIndex(null);
                     }}
@@ -279,7 +420,7 @@ const ExpenseDetail: React.FC = () => {
             {/* Add Expense Button */}
 
             <TouchableOpacity
-              onPress={() => handleAddExpense(itineraryIndex)}
+              onPress={() => handleAddExpense(iIdx)}
               style={styles.addButton}
             >
               <Text style={styles.addtextButton}>Add More Expense</Text>
@@ -290,9 +431,7 @@ const ExpenseDetail: React.FC = () => {
               <View key={expenseIndex} style={{ marginTop: 20 }}>
                 {itinerary.expenses.length > 1 && (
                   <TouchableOpacity
-                    onPress={() =>
-                      handleRemoveExpense(itineraryIndex, expenseIndex)
-                    }
+                    onPress={() => handleRemoveExpense(iIdx, expenseIndex)}
                     style={styles.deleteIcon}
                   >
                     <MaterialIcons name="delete" size={20} color="blue" />
@@ -304,13 +443,14 @@ const ExpenseDetail: React.FC = () => {
                   value={expense.expenseCategory}
                   onChangeText={(val) => {
                     const updated = [...itineraries];
-                    updated[itineraryIndex].expenses[
-                      expenseIndex
-                    ].expenseCategory = val;
+                    updated[iIdx].expenses[expenseIndex].expenseCategory = val;
                     setItineraries(updated);
                   }}
                   placeholder="Select Category"
                 />
+                <Text style={styles.helper}>
+                  {getCategoryDescription(expense.expenseCategory)}
+                </Text>
 
                 <Text style={styles.label}>Bill Date*</Text>
                 <TextInput
@@ -318,8 +458,7 @@ const ExpenseDetail: React.FC = () => {
                   value={expense.billDate}
                   onChangeText={(val) => {
                     const updated = [...itineraries];
-                    updated[itineraryIndex].expenses[expenseIndex].billDate =
-                      val;
+                    updated[iIdx].expenses[expenseIndex].billDate = val;
                     setItineraries(updated);
                   }}
                   placeholder="Enter Bill Date"
@@ -332,9 +471,8 @@ const ExpenseDetail: React.FC = () => {
                       value={expense.isBillAvailable}
                       onValueChange={(val) => {
                         const updated = [...itineraries];
-                        updated[itineraryIndex].expenses[
-                          expenseIndex
-                        ].isBillAvailable = val;
+                        updated[iIdx].expenses[expenseIndex].isBillAvailable =
+                          val;
                         setItineraries(updated);
                       }}
                       thumbColor={expense.isBillAvailable ? "#083c6c" : "#ccc"}
@@ -350,9 +488,7 @@ const ExpenseDetail: React.FC = () => {
                         value={expense.billNumber}
                         onChangeText={(val) => {
                           const updated = [...itineraries];
-                          updated[itineraryIndex].expenses[
-                            expenseIndex
-                          ].billNumber = val;
+                          updated[iIdx].expenses[expenseIndex].billNumber = val;
                           setItineraries(updated);
                         }}
                         placeholder="Enter Bill Number"
@@ -368,8 +504,7 @@ const ExpenseDetail: React.FC = () => {
                   value={expense.billAmount}
                   onChangeText={(val) => {
                     const updated = [...itineraries];
-                    updated[itineraryIndex].expenses[expenseIndex].billAmount =
-                      val;
+                    updated[iIdx].expenses[expenseIndex].billAmount = val;
                     setItineraries(updated);
                   }}
                   placeholder="Enter Bill Amount"
@@ -377,7 +512,7 @@ const ExpenseDetail: React.FC = () => {
 
                 <Text style={styles.label}>Upload File</Text>
                 <TouchableOpacity
-                  onPress={() => handleFilePick(itineraryIndex, expenseIndex)}
+                  onPress={() => handleFilePick(iIdx, expenseIndex)}
                   style={styles.filePicker}
                 >
                   <Text>{expense.fileName || "Choose File"}</Text>
@@ -392,8 +527,7 @@ const ExpenseDetail: React.FC = () => {
                   value={expense.remarks}
                   onChangeText={(val) => {
                     const updated = [...itineraries];
-                    updated[itineraryIndex].expenses[expenseIndex].remarks =
-                      val;
+                    updated[iIdx].expenses[expenseIndex].remarks = val;
                     setItineraries(updated);
                   }}
                   placeholder="Enter Remarks"
@@ -417,15 +551,45 @@ const ExpenseDetail: React.FC = () => {
         </View>
 
         <View style={styles.buttonRow}>
-          <Button mode="contained" onPress={() => {}} style={styles.button}>
-            Save
-          </Button>
-          <Button mode="outlined" onPress={() => {}} style={styles.button}>
-            Draft
-          </Button>
-          <Button mode="text" onPress={() => {}} style={styles.button}>
-            Cancel
-          </Button>
+          <TouchableOpacity
+            onPress={() => {}}
+            style={[styles.button, { backgroundColor: "#1976d2" }]}
+          >
+            <Text
+              style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}
+            >
+              Save
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {}}
+            style={[
+              styles.button,
+              {
+                borderWidth: 1,
+                borderColor: "#1976d2",
+                backgroundColor: "#fff",
+              },
+            ]}
+          >
+            <Text
+              style={{
+                color: "#1976d2",
+                textAlign: "center",
+                fontWeight: "bold",
+              }}
+            >
+              Draft
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {}}
+            style={[styles.button, { backgroundColor: "transparent" }]}
+          >
+            <Text style={{ color: "#1976d2", textAlign: "center" }}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </Provider>
