@@ -10,7 +10,6 @@ import {
   Modal,
 } from "react-native";
 import { Provider, Switch } from "react-native-paper";
-// No Picker import needed
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import DocumentPicker from "@react-native-documents/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -172,7 +171,7 @@ const ExpenseDetail: React.FC = () => {
           },
         });
         const projects = Array.isArray(res.data.data) ? res.data.data : [];
-        console.log("projects :", projects);
+        // console.log("projects :", projects);
         setProjectList([...projects, OTHERS_OPTION]);
       } catch (err) {
         console.error("Error fetching projects:", err);
