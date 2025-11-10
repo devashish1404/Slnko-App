@@ -4,7 +4,7 @@ import ExpenseDetail from "../ExpenseClaim/ExpenseDetail";
 const Stack = createNativeStackNavigator();
 
 <Stack.Screen
-  name="ExpenseDetail"
+  name="ExpenseDetailsss"
   component={ExpenseDetail}
-  options={{ title: "Expense Detail" }}
+  options={{ title: "Expense Detailss" }}
 />;
