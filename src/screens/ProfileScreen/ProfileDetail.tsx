@@ -11,6 +11,7 @@ import {
 import Feather from "react-native-vector-icons/Feather";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles, colors } from "./styles";
+import axios from "axios";
 
 type User = {
   name: string;
@@ -24,28 +25,51 @@ const ProfileDetail: React.FC<{ onViewProfile?: () => void }> = ({
   onViewProfile,
 }) => {
   const [user, setUser] = useState<User>({
-    name: "Devashish Pandey",
-    emp_id: "60034955420",
-    email: "devashishpandey33@gmail.com",
+    name: "",
+    emp_id: "",
+    email: "",
   });
 
-  useEffect(() => {
-    // Optional: hydrate from your stored userData
-    (async () => {
-      try {
-        const raw = await AsyncStorage.getItem("userData");
-        if (raw) {
-          const u = JSON.parse(raw);
-          setUser((prev) => ({
-            ...prev,
-            name: u?.name || prev.name,
-            emp_id: u?.emp_id || u?.userID || prev.emp_id,
-            email: u?.email || prev.email,
-          }));
+ useEffect(() => {
+  const fetchUserProfile = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        console.warn("No token found");
+        return;
+      }
+
+      const response = await axios.get(
+        "https://dev.api.slnkoprotrac.com/v1/get-all-user-IT",
+        {
+          headers: { "x-auth-token": token },
         }
-      } catch {}
-    })();
-  }, []);
+      );
+
+      const userData = await AsyncStorage.getItem("userData");
+      const parsed = userData ? JSON.parse(userData) : null;
+      const userId = parsed?.userID;
+
+      const matched = response?.data?.data?.find(
+        (item: any) => String(item._id) === String(userId)
+      );
+
+      if (matched) {
+        setUser({
+          name: matched.name,
+          emp_id: matched.emp_id,
+          email: matched.email,
+          avatarUrl: matched.avatar || "",
+        });
+      }
+    } catch (error) {
+      console.log("Error fetching user:", error);
+    }
+  };
+
+  fetchUserProfile();
+}, []);
+
   
 
   return (

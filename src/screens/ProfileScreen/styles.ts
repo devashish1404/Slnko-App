@@ -1,7 +1,6 @@
 import { StyleSheet, Platform } from "react-native";
 
 export const colors = {
-  // Light theme palette
   bg: "#F5F7FB",        // page background (very light grey)
   card: "#FFFFFF",      // cards
   text: "#111827",      // primary text (near-black)
