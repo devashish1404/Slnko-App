@@ -12,6 +12,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import CustomSidebar from "./src/components/customSidebar";
 import { TabProvider } from "./src/store/tabContext";
+import { Provider as ReduxProvider } from "react-redux";
+import { store } from "./src/store";
 // import ExpenseApprove from "./src/screens/ExpenseApproval/ExpenseApprove";
 
 const Stack = createNativeStackNavigator();
@@ -45,7 +47,7 @@ const BottomTabs = () => {
         name="ProfileDetail"
         component={ProfileDetail}
         options={{
-          title: "Profile Detail",
+          title: "Settings",
           headerStyle: {
             backgroundColor: "#003366",
           },
@@ -83,27 +85,24 @@ const DrawerLayout = () => {
 
 const App = () => {
   return (
-    <TabProvider>
-      <PaperProvider>
-        <NavigationContainer>
-          <View style={{ flex: 1 }}>
-            <Stack.Navigator initialRouteName="Login">
-              <Stack.Screen name="Login" component={LoginScreen} />
-              <Stack.Screen
-                name="Main"
-                component={DrawerLayout}
-                options={{ headerShown: false }}
-              />
-              {/* <Stack.Screen
-                name="ExpenseApprove"
-                component={ExpenseApprove}
-                options={{ title: "Expense Approval" }}
-              /> */}
-            </Stack.Navigator>
-          </View>
-        </NavigationContainer>
-      </PaperProvider>
-    </TabProvider>
+  <ReduxProvider store={store}>
+      <TabProvider>
+        <PaperProvider>
+          <NavigationContainer>
+            <View style={{ flex: 1 }}>
+              <Stack.Navigator initialRouteName="Login">
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen
+                  name="Main"
+                  component={DrawerLayout}
+                  options={{ headerShown: false }}
+                />
+              </Stack.Navigator>
+            </View>
+          </NavigationContainer>
+        </PaperProvider>
+      </TabProvider>
+    </ReduxProvider>
   );
 };
 

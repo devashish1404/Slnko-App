@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { styles } from "../HomeScreen/styles";
 import CustomHeader from "../../components/customHeader";
 import { useNavigation } from "@react-navigation/native";
+import { Button, TextInput } from "react-native-paper";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 // import TestingApp from "../../components/notifyUser";
 const { width } = Dimensions.get("window");
 
@@ -45,6 +47,43 @@ const features = [
     icon: require("../../../assets/images/home_image/calendar.png"),
   },
 ];
+
+  const dispatch = useAppDispatch()
+  const count = useAppSelector((s) => s.counter.value)
+  const [step, setStep] = useState('5')
+
+export const Counter =() =>{
+  return(
+     <View style={styles.container}>
+      <Text style={styles.title}>Counter: {count}</Text>
+
+      <View style={styles.row}>
+        <Btn label="-1" onPress={() => dispatch(decrement())} />
+        <Btn label="+1" onPress={() => dispatch(increment())} />
+        <TextInput
+          value={step}
+          onChangeText={setStep}
+          keyboardType="numeric"
+          placeholder="step"
+          style={styles.input}
+        />
+        <Btn
+          label={`+${step || 0}`}
+          onPress={() => dispatch(addBy(Number(step) || 0))}
+        />
+        <Btn label="Reset" onPress={() => dispatch(reset())} />
+      </View>
+    </View>
+  )
+}
+
+function Btn({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.btn}>
+      <Text style={styles.btnText}>{label}</Text>
+    </TouchableOpacity>
+  )
+}
 
 const HomeScreen: React.FC = () => {
 
