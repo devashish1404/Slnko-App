@@ -18,6 +18,8 @@ import { saveToken } from "../../utils/auth";
 import type { RootStackParamList } from "../../../src/navigation/types";
 import ButtonComp from "../../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAppDispatch } from "../../store/hooks";
+import { setButtonDisabled, setButtonLoading } from "../../store/buttonSlice";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Login">;
 
@@ -31,6 +33,9 @@ const LoginScreen: React.FC = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogMessage, setDialogMessage] = useState("");
+
+  const dispatch = useAppDispatch();
+
 
   const showDialog = (title: string, message: string) => {
     setDialogTitle(title);
@@ -48,10 +53,12 @@ const LoginScreen: React.FC = () => {
       );
       return;
     }
+   
 
     try {
-      setLoading(true);
-
+      // setLoading(true);
+  dispatch(setButtonLoading(true));
+    dispatch(setButtonDisabled(true));
       const response = await axios.post(
         "https://dev.api.slnkoprotrac.com/v1/logiN-IT",
         {
@@ -106,7 +113,9 @@ const LoginScreen: React.FC = () => {
         "Please check your credentials and try again."
       );
     } finally {
-      setLoading(false);
+      // setLoading(false);
+       dispatch(setButtonLoading(false));
+      dispatch(setButtonDisabled(false));
     }
   };
 

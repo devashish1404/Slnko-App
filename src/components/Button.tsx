@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   StyleProp,
@@ -6,9 +7,8 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import { Button } from "react-native-paper";
-
-// Optional: Import your own styles
 import { styles } from "../screens/LoginScreen/styles";
+import { useAppSelector } from "../store/hooks";
 
 interface ButtonCompProps {
   title?: string;
@@ -18,19 +18,27 @@ interface ButtonCompProps {
 }
 
 export default function ButtonComp({
-  title = "Login",
+  title,
   style,
   textStyle,
   onPress,
 }: ButtonCompProps) {
+  const { label, loading, disabled } = useAppSelector(
+    (state) => state.button
+  );
+
+  const finalTitle = title ?? label;
+
   return (
     <Button
       mode="contained-tonal"
       onPress={onPress}
       style={[styles.loginButton, style]}
       labelStyle={textStyle}
+      loading={loading}
+      disabled={disabled || loading}
     >
-      {title}
+      {finalTitle}
     </Button>
   );
 }

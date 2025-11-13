@@ -14,6 +14,7 @@ import CustomSidebar from "./src/components/customSidebar";
 import { TabProvider } from "./src/store/tabContext";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "./src/store";
+import { lightTheme } from "./src/theme";
 // import ExpenseApprove from "./src/screens/ExpenseApproval/ExpenseApprove";
 
 const Stack = createNativeStackNavigator();
@@ -87,7 +88,7 @@ const App = () => {
   return (
   <ReduxProvider store={store}>
       <TabProvider>
-        <PaperProvider>
+        <PaperProvider theme={lightTheme}>
           <NavigationContainer>
             <View style={{ flex: 1 }}>
               <Stack.Navigator initialRouteName="Login">
