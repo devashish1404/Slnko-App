@@ -1,4 +1,3 @@
-// src/screens/HomeScreen/index.tsx
 import React from "react";
 import {
   View,
@@ -56,6 +55,8 @@ const HomeScreen: React.FC = () => {
       navigation.navigate("ProfileDetail" as never);
     } else if (label === "Expense Claim") {
       navigation.navigate("ExpenseDetail" as never);
+    }else if (label === "DPR Submission") {
+      navigation.navigate("DPRScreen" as never);
     }
   };
 

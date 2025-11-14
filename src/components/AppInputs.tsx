@@ -5,10 +5,11 @@ import { View, StyleSheet } from "react-native";
 interface AppInputProps {
   form: string;
   field: string;
-  labelText?: string;
-  helperText?: string;
+  labelText: string;
   value: string;
-  onChangeText: (text: string) => void;
+  onChangeText: (value: string) => void;
+  helperText?: string;
+  editable?: boolean;
 }
 
 const AppInput: React.FC<AppInputProps> = ({
