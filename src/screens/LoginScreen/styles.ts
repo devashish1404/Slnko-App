@@ -38,6 +38,8 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     marginBottom: 16,
+    
+    
   },
   loginButtonText: {
     color: "#fff",

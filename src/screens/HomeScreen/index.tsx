@@ -29,7 +29,7 @@ const features = [
     icon: require("../../../assets/images/home_image/baggage.png"),
   },
   {
-    label: "TA Claim Approval",
+    label: "DPR Submission",
     icon: require("../../../assets/images/home_image/TA_approval.png"),
   },
   {

@@ -19,7 +19,7 @@ import type { RootStackParamList } from "../../../src/navigation/types";
 import ButtonComp from "../../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppDispatch } from "../../store/hooks";
-import { setButtonDisabled, setButtonLoading } from "../../store/buttonSlice";
+import { setButtonDisabled, setButtonLoading } from "../../store/slices/buttonSlice";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Login">;
 

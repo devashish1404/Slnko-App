@@ -34,7 +34,7 @@ export default function ButtonComp({
       mode="contained-tonal"
       onPress={onPress}
       style={[styles.loginButton, style]}
-      labelStyle={textStyle}
+      // labelStyle={textStyle}
       loading={loading}
       disabled={disabled || loading}
     >
